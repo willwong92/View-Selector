@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void parseData() {
         try {
-            ArrayList<String> inputList;
+            ArrayList<JSONObject> inputList;
             String myJson = inputStreamToString(getResources().openRawResource(R.raw.systemviewcontroller));
             String input = editText.getText().toString();
             JSONObject json = new JSONObject(myJson);
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 showData(textView, inputList);
             } else {
                 inputList = new ArrayList<>();
-                findClass(json.getJSONArray("subviews"), inputList, input);
+                findClass(json.getJSONArray("subviews"),inputList, input);
                 showData(textView, inputList);
             }
 
@@ -60,21 +60,21 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-    public void showData(TextView textView, ArrayList<String> list){
+    public void showData(TextView textView, ArrayList<JSONObject> list){
         textView.setText("");
         for (int i = 0; i < list.size(); i++) {
-            textView.append(list.get(i));
+            textView.append(list.get(i).toString());
             textView.append("\n");
         }
 
     }
 
 
-    public void findIdentifier(JSONObject obj, ArrayList<String> identifierList, String input) {
+    public void findIdentifier(JSONObject obj, ArrayList<JSONObject> identifierList, String input) {
         try {
             if (obj.has("identifier")) {
                 if (obj.getString("identifier").equals(input)) {
-                    identifierList.add(input);
+                    identifierList.add(new JSONObject().put("identifier", input));
                 }
             }
             findIdentifierHelper(obj.getJSONArray("subviews"),identifierList,input);
@@ -82,19 +82,19 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-    public void findIdentifierHelper(JSONArray array, ArrayList<String> identifierList, String input) {
+    public void findIdentifierHelper(JSONArray array, ArrayList<JSONObject> identifierList, String input) {
         try {
             for (int i = 0; i < array.length(); i++) {
                 if (array.getJSONObject(i).has("identifier")) {
                     if (array.getJSONObject(i).getString("identifier").equals(input)) {
-                        identifierList.add(input);
+                        identifierList.add(new JSONObject().put("identifier",input));
                         System.out.println(input);
                     }
                 }
                 if (array.getJSONObject(i).has("control")) {
                     if (array.getJSONObject(i).getJSONObject("control").has("identifier")){
                         if (array.getJSONObject(i).getJSONObject("control").getString("identifier").equals(input))
-                            identifierList.add(input);
+                            identifierList.add(new JSONObject().put("identifier",input));
                             System.out.println(input);
                     }
                 }
@@ -112,30 +112,30 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-    public void findClass(JSONArray array, ArrayList<String> classList, String input) {
+    public void findClass(JSONArray array,ArrayList<JSONObject> list, String input) {
         try {
             for (int i = 0; i < array.length(); i++) {
                 if (array.getJSONObject(i).has("class")) {
                     if (array.getJSONObject(i).getString("class").equals(input)) {
                         System.out.println(input);
-                        classList.add(input);
+                        list.add(new JSONObject().put("class",input));
                     }
                 }
                 if (array.getJSONObject(i).has("control")) {
                     if (array.getJSONObject(i).getJSONObject("control").has("class")) {
                         if (array.getJSONObject(i).getJSONObject("control").getString("class").equals(input)) {
-                            classList.add(input);
+                            list.add(new JSONObject().put("class",input));
                             System.out.println(input);
                         }
                     }
                 }
                 if (array.getJSONObject(i).has("contentView")) {
                     if (array.getJSONObject(i).getJSONObject("contentView").has("subviews")) {
-                        findClass(array.getJSONObject(i).getJSONObject("contentView").getJSONArray("subviews"), classList, input);
+                        findClass(array.getJSONObject(i).getJSONObject("contentView").getJSONArray("subviews"),list, input);
                     }
                 }
                 if (array.getJSONObject(i).has("subviews")) {
-                    findClass(array.getJSONObject(i).getJSONArray("subviews"), classList,input);
+                    findClass(array.getJSONObject(i).getJSONArray("subviews"),list,input);
                 }
             }
 
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-    public void findClassName(JSONArray array, ArrayList<String> list, String input) {
+    public void findClassName(JSONArray array, ArrayList<JSONObject> list, String input) {
         try {
             for (int i = 0; i < array.length(); i++) {
                 if (array.getJSONObject(i).has("classNames")) {
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                      for (int j = 0; j < classNameArray.length(); j++) {
                          if (classNameArray.getString(j).equals(input)) {
                              System.out.println("nice" + i);
-                             list.add(input);
+                             list.add(new JSONObject().put("classNames",input));
                          }
                     }
                 }
